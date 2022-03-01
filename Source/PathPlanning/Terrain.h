@@ -21,10 +21,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void GenerateWall(int x, int y);
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	TArray<int> PathFinding(int x, int y);
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadOnly, Category = Wall)
 		TSubclassOf<class AWall> WallClass;

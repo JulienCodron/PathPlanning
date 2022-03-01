@@ -45,7 +45,7 @@ void ATerrain::BeginPlay()
 				switch (c)
 				{
 					case '1':
-						GenerateWall(x,y);
+						GenerateWall(x-25,y-25);
 						break;
 
 					default:
@@ -65,7 +65,6 @@ void ATerrain::BeginPlay()
 void ATerrain::GenerateWall(int x, int y)
 {
 	if (WallClass == nullptr) return;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("OK")));
 
 	FVector SpawnLocation = this->GetActorLocation();
 	SpawnLocation.X += x;
@@ -74,6 +73,14 @@ void ATerrain::GenerateWall(int x, int y)
 	FTransform SpawnTransform(this->GetActorRotation(), SpawnLocation);
 	AWall* Wall = GetWorld()->SpawnActor<AWall>(WallClass, SpawnTransform);
 	Wall->FinishSpawning(SpawnTransform);
+}
+
+TArray<int> ATerrain::PathFinding(int x, int y)
+{
+	//verifier si x/y pas un mur, sinon trouver la case la plus close du mur et dans la direction du perso puis relancer foncion sur ces coord
+	//a* voir cours
+
+	return TArray<int>();
 }
 
 // Called every frame
