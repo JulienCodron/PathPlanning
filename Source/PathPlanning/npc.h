@@ -15,16 +15,15 @@ public:
 	// Sets default values for this character's properties
 	Anpc();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MoveActor")
+		class USceneComponent* RootScene;
 
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-
-		float BaseLookUpRate;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MoveActor")
+		float Speed;
 
 public:	
 	// Called every frame
@@ -33,4 +32,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void MoveForward(float Value);
+	void MoveRight(float Value);
 };

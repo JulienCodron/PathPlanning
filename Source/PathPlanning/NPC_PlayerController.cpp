@@ -26,8 +26,36 @@ void ANPC_PlayerController::BeginPlay()
 
     character = Cast<Anpc>(this->GetCharacter());
     if (!character) { GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "No Character Found (NPC_PlayerController)"); }
-    else { GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, character->GetName()); }
+
 }
+
+void ANPC_PlayerController::FollowPath(TArray<int> path)
+{
+    if (path.Num() < 0) return;
+    character->MoveForward(50.f);
+    //FAIRE UN MOOVETO(location) //Moveforward, turnrate etccccc voir escape game
+    //for (int direction : path)
+    //{
+    //    switch (direction)
+    //    {
+    //    case 0: //haut
+    //        character->MoveForward(50.f);
+    //        break;
+    //    case 1: //droite
+    //        character->MoveRight(50.f);
+    //        break;
+    //    case 2: //bas
+    //        character->MoveForward(-50.f);
+    //        break;
+    //    case 3: //gauche
+    //        character->MoveRight(-50.f);
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //}
+}
+
 
 void ANPC_PlayerController::OnMouseClick()
 {
@@ -41,33 +69,12 @@ void ANPC_PlayerController::OnMouseClick()
         int PosYOnMatrix = location.Y/50;
 
         TArray<int> path = terrain->PathFinding(PosXOnMatrix, PosYOnMatrix);
+        path = { 0,0,0,1,1,1,0,0,2,2,3,3,3,2,2,2 };
         FollowPath(path);
     }
 }
 
 
-void ANPC_PlayerController::FollowPath(TArray<int> path)
-{
-    if (path.Num() < 0) return;
-
-    //FAIRE UN MOOVETO(location) //Moveforward, turnrate etccccc voir escape game
-    for (int direction : path)
-    {
-        switch (direction)
-        {
-        case 0: //haut
-            break;
-        case 1: //droite
-            break;
-        case 2: //bas
-            break;
-        case 3: //gauche
-            break;
-        default:
-            break;
-        }
-    }
-}
 
 
 
