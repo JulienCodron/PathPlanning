@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Terrain.h"
 
+
 void ANPC_PlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
@@ -32,7 +33,9 @@ void ANPC_PlayerController::BeginPlay()
 void ANPC_PlayerController::FollowPath(TArray<int> path)
 {
     if (path.Num() < 0) return;
-    character->MoveForward(50.f);
+    
+    character = Cast<Anpc>(this->GetCharacter());
+    character->MoveForward(50);
     //FAIRE UN MOOVETO(location) //Moveforward, turnrate etccccc voir escape game
     //for (int direction : path)
     //{

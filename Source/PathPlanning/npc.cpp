@@ -4,6 +4,7 @@
 #include "npc.h"
 #include "NPC_PlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 
 // Sets default values
 Anpc::Anpc()
@@ -38,11 +39,15 @@ void Anpc::MoveForward(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
+		FVector Direction = { 0,90,0 };
+		if (Value < 0.0f)
+		{
+			Direction = { 0,0, 240 };
+		}
+		AddActorWorldRotation(Direction.ToOrientationQuat());
 
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		FVector goal = {GetActorLocation().X + Value, GetActorLocation().Y , GetActorLocation().Z};
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), goal);
 	}
 }
 
@@ -50,10 +55,15 @@ void Anpc::MoveRight(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
+		FVector Direction = { 0,0,0 };
+		if (Value < 0.0f) 
+		{
+			Direction = { 0,0,180 };
+		}
+		SetActorRotation(Direction.ToOrientationQuat());
+
+		FVector goal = { GetActorLocation().X  , GetActorLocation().Y + Value, GetActorLocation().Z };
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), goal);
 	}
 }
 
