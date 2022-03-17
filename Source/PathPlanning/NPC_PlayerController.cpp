@@ -5,7 +5,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Terrain.h"
 
-
 void ANPC_PlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
@@ -30,50 +29,31 @@ void ANPC_PlayerController::BeginPlay()
 
 }
 
-void ANPC_PlayerController::FollowPath(TArray<int> path)
-{
-    if (path.Num() < 0) return;
-    
-    character = Cast<Anpc>(this->GetCharacter());
-   
-    //FAIRE UN MOOVETO(location) //Moveforward, turnrate etccccc voir escape game
-    for (int direction : path)
-    {
-        switch (direction)
-        {
-        case 0: //haut
-            character->MoveForward(50.f);
-            break;
-        case 1: //droite
-            character->MoveRight(50.f);
-            break;
-        case 2: //bas
-            character->MoveForward(-50.f);
-            break;
-        case 3: //gauche
-            character->MoveRight(-50.f);
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-
 void ANPC_PlayerController::OnMouseClick()
 {
     FHitResult HitResult;
     GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, false, HitResult);
     FVector location = HitResult.Location;
+    character = Cast<Anpc>(this->GetCharacter());
 
-    if (HitResult.GetComponent())
+    if (HitResult.GetComponent() && character!=NULL)
     {
-        int PosXOnMatrix = 20 - location.X/50;
-        int PosYOnMatrix = location.Y/50;
+        int x1 = 20 - character->GetActorLocation().X / 50;
+        int y1 = character->GetActorLocation().Y / 50;
 
-        TArray<int> path = terrain->PathFinding(PosXOnMatrix, PosYOnMatrix);
-        path = { 0,0,1,1,1,1,0,0,2,2,3,3,3,3,2,2 };
-        FollowPath(path);
+        int x2 = 20 - location.X/50;
+        int y2 = location.Y/50;
+
+        int heuristique = terrain->Manhattan(x1, y1, x2, y2);
+
+        Noeud depart = {x1,y1,0,0};
+        Noeud objectif = {x2,y2,1,heuristique};
+        
+        TArray<Noeud> path = terrain->PathFinding(depart, objectif);
+        for (Noeud c : path)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("%d/%d"), c.x, c.y));
+        }
     }
 }
 

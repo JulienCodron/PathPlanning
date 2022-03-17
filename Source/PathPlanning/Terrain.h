@@ -6,16 +6,32 @@
 #include "GameFramework/Actor.h"
 #include "Terrain.generated.h"
 
+typedef struct _Noeud {
+	int x;
+	int y;
+	int cout;
+	int heuristique;
+	struct _Noeud  * Parent;
+}Noeud;
+
 UCLASS()
 class PATHPLANNING_API ATerrain : public AActor
 {
 	GENERATED_BODY()
-	
+
+	int compareHeuristique(Noeud n1, Noeud n2);
+	bool InMatrix(std::tuple<int, int> voisin);
+	bool ContainsNoeud(TArray<Noeud> list, Noeud v);
+	bool ContainsCloserH(TArray<Noeud> list, Noeud v);
+	void SortListNoeud(TArray<Noeud>& list);
+
+
 public:	
 	// Sets default values for this actor's properties
 	ATerrain();
 
 	TArray<TArray<int>> matrix;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,9 +40,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	TArray<int> PathFinding(int x, int y);
+	TArray<Noeud> PathFinding(Noeud depart, Noeud objectif);
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadOnly, Category = Wall)
 		TSubclassOf<class AWall> WallClass;
 
+	int Manhattan(int x1, int y1, int x2, int y2);
 };

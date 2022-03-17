@@ -19,7 +19,6 @@ class PATHPLANNING_API ANPC_PlayerController : public APlayerController
 	
 protected: 
 	virtual void BeginPlay() override;
-	void FollowPath(TArray<int> path);
 
 public:
 	void SetupInputComponent() override;
