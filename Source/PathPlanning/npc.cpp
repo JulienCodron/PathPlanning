@@ -39,6 +39,8 @@ void Anpc::MoveForward(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
+		bool arriver = false;
+
 		FVector Direction = { 0,90,0 };
 		if (Value < 0.0f)
 		{
@@ -48,6 +50,14 @@ void Anpc::MoveForward(float Value)
 
 		FVector goal = {GetActorLocation().X + Value, GetActorLocation().Y , GetActorLocation().Z};
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), goal);
+
+		FTimerHandle timer;
+		GetWorld()->GetTimerManager().SetTimer(timer, 0, false);
+		/*while (!arriver || GetWorld()->GetTimerManager().GetTimerElapsed(timer) > 1.0f) {
+			if (GetActorLocation().Equals(goal, 5)) arriver = true;
+			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, FString::Printf(TEXT("%f"), GetWorld()->GetTimerManager().GetTimerElapsed(timer)));
+		}
+		GetWorld()->GetTimerManager().ClearTimer(timer);*/
 	}
 }
 
@@ -55,6 +65,7 @@ void Anpc::MoveRight(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
+		bool arriver = false;
 		FVector Direction = { 0,0,0 };
 		if (Value < 0.0f) 
 		{
@@ -64,6 +75,14 @@ void Anpc::MoveRight(float Value)
 
 		FVector goal = { GetActorLocation().X  , GetActorLocation().Y + Value, GetActorLocation().Z };
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), goal);
+
+		FTimerHandle timer;
+		GetWorld()->GetTimerManager().SetTimer(timer,0,false);
+		/*while (!arriver || GetWorld()->GetTimerManager().GetTimerElapsed(timer) > 1.0f) {
+			if (GetActorLocation().Equals(goal, 5)) arriver = true;
+			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, FString::Printf(TEXT( "%f"), GetWorld()->GetTimerManager().GetTimerElapsed(timer)));
+		}
+		GetWorld()->GetTimerManager().ClearTimer(timer);*/
 	}
 }
 
