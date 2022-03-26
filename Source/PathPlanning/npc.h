@@ -11,6 +11,7 @@ class PATHPLANNING_API Anpc : public ACharacter
 {
 	GENERATED_BODY()
 
+	FVector directionLocation;
 public:
 	// Sets default values for this character's properties
 	Anpc();

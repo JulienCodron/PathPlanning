@@ -11,7 +11,8 @@ typedef struct _Noeud {
 	int y;
 	int cout;
 	int heuristique;
-	struct _Noeud  * Parent;
+	struct _Noeud  * Parent = nullptr;
+	int movement;
 }Noeud;
 
 UCLASS()
@@ -20,10 +21,11 @@ class PATHPLANNING_API ATerrain : public AActor
 	GENERATED_BODY()
 
 	int compareHeuristique(Noeud n1, Noeud n2);
-	bool InMatrix(std::tuple<int, int> voisin);
+	bool isValid(int x, int y);
 	bool ContainsNoeud(TArray<Noeud> list, Noeud v);
-	bool ContainsCloserH(TArray<Noeud> list, Noeud v);
-	void SortListNoeud(TArray<Noeud>& list);
+	bool ContainsCloserH(TArray<Noeud*> list, Noeud v);
+	void SortListNoeud(TArray<Noeud*>& list);
+	void RemoveFirstNode(TArray<Noeud*>& list);
 
 
 public:	
@@ -40,7 +42,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	TArray<Noeud> PathFinding(Noeud depart, Noeud objectif);
+	TArray<int> PathFinding(Noeud depart, Noeud objectif);
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadOnly, Category = Wall)
 		TSubclassOf<class AWall> WallClass;

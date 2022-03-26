@@ -38,21 +38,19 @@ void ANPC_PlayerController::OnMouseClick()
 
     if (HitResult.GetComponent() && character!=NULL)
     {
-        int x1 = 20 - character->GetActorLocation().X / 50;
+        int x1 = character->GetActorLocation().X / 50;
         int y1 = character->GetActorLocation().Y / 50;
 
-        int x2 = 20 - location.X/50;
+        int x2 = location.X/50;
         int y2 = location.Y/50;
 
         int heuristique = terrain->Manhattan(x1, y1, x2, y2);
 
-        Noeud depart = {x1,y1,0,0};
-        Noeud objectif = {x2,y2,1,heuristique};
-        
-        TArray<Noeud> path = terrain->PathFinding(depart, objectif);
-        for (Noeud c : path)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("%d/%d"), c.x, c.y));
+        Noeud depart = {x1,y1,0,heuristique};
+        Noeud objectif = {x2,y2,0,0};
+        TArray<int> path = terrain->PathFinding(depart, objectif);
+        for (int i = path.Num()-1 ; i >= 0; i--) {
+            character->path.Add(path[i]);
         }
     }
 }

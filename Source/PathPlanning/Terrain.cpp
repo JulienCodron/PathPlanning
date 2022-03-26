@@ -18,43 +18,49 @@ ATerrain::ATerrain()
 void ATerrain::BeginPlay()
 {
 	Super::BeginPlay();
-	int x = 50;
-	matrix.SetNum(50);
 
-for (int i = 0; i < x; i++) {
-	matrix[i].Init(1, 50);
-}
+	matrix.SetNum(20);
+	for (int i = 0; i < 20; i++) {
+		matrix[i].Init(1, 20);
+	}
 
-std::ifstream file;
-std::string dir = TCHAR_TO_UTF8(*FPaths::ProjectContentDir());
-std::string fileName = dir + "Map/MapTxt/DefaultMap.txt";
-file.open(fileName);
+	std::ifstream file;
+	std::string dir = TCHAR_TO_UTF8(*FPaths::ProjectContentDir());
+	std::string fileName = dir + "Map/MapTxt/DefaultMap.txt";
+	file.open(fileName);
 
 
-if (file.is_open())
-{
-	x = 0;
-	std::string line;
-	while (std::getline(file, line))
+	if (file.is_open())
 	{
-		x += 50;
-		int y = 0;
-		for (char c : line)
+		int x = 0;
+		std::string line;
+		while (std::getline(file, line))
 		{
-			y += 50;
-			switch (c)
+			int y = 0;
+			for (char c : line)
 			{
-			case '1':
-				GenerateWall(x - 25, y - 25);
-				break;
-
-			default:
-				break;
+				switch (c)
+				{
+				case '1':
+					GenerateWall(x*50 + 25 , y*50 + 25);
+					if (x >= 0 && x <= 19 && y >= 0 && y <= 19) matrix[x][y] = 1;
+					break;
+				case ',':
+					break;
+				default:
+					if (x >= 0 && x <= 19 && y >= 0 && y <= 19) matrix[x][y] = 0;
+					break;
+				}	
+				y += 1;
 			}
+			x += 1;
 		}
 	}
-}
-file.close();
+	file.close();
+	/*for (int x = 0; x < matrix.Num(); ++x)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 60, FColor::Red, FString::Printf(TEXT("%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d/%d"), matrix[x][0], matrix[x][1], matrix[x][2], matrix[x][3], matrix[x][4], matrix[x][5], matrix[x][6], matrix[x][7], matrix[x][8], matrix[x][9], matrix[x][10], matrix[x][11], matrix[x][12], matrix[x][13], matrix[x][14], matrix[x][15], matrix[x][16], matrix[x][17], matrix[x][18], matrix[x][19]));
+	}*/
 }
 
 void ATerrain::GenerateWall(int x, int y)
@@ -91,16 +97,20 @@ int ATerrain::Manhattan(int x1, int y1, int x2, int y2)
 	return  x_dif + y_dif;
 }
 
-bool ATerrain::InMatrix(std::tuple<int,int> voisin) 
+bool ATerrain::isValid(int x, int y)
 {
-	return std::get<0>(voisin) >= 0 && std::get<0>(voisin) <= matrix.Num() && std::get<0>(voisin) >= 0 && std::get<0>(voisin) <= matrix[0].Num();
+	if (x >= 0 && x < matrix.Num() && y >= 0 && y < matrix[0].Num())
+	{
+		return matrix[x][y] == 0;
+	}
+	return false;
 }
 
 bool ATerrain::ContainsNoeud(TArray<Noeud> list, Noeud v)
 {
 	for (Noeud n : list)
 	{
-		if (n.x == v.x, n.y == v.y, n.heuristique == v.heuristique)
+		if (n.x == v.x && n.y == v.y)
 		{
 			return true;
 		}
@@ -108,83 +118,91 @@ bool ATerrain::ContainsNoeud(TArray<Noeud> list, Noeud v)
 	return false;
 }
 
-bool ATerrain::ContainsCloserH(TArray<Noeud> list, Noeud v)
+bool ATerrain::ContainsCloserH(TArray<Noeud*> list, Noeud v)
 {
-	for (Noeud n : list)
+	for (Noeud * n : list)
 	{
-
+		if (n->x == v.x, n->y == v.y && n->cout < v.cout ) return true;
 	}
 	return false;
 }
 
-void ATerrain::SortListNoeud(TArray<Noeud> &list)
+void ATerrain::SortListNoeud(TArray<Noeud*> &list)
 {
-	Noeud min = list[0];
-	for (Noeud n : list)
+	if (list.Num() > 0)
 	{
-		if (n.cout + n.heuristique < min.cout + min.heuristique) min = n;
-	}
-	Swap(min, list[0]);
+		Noeud *min = list[0];
+		int index = 0;
+		for (int x = 0; x < list.Num(); ++x)
+		{
+			if (list[x]->cout + list[x]->heuristique < min->cout + min->heuristique) {
+				index = x;
+				min = list[x];
+			}
+		}
+		Swap(list[index], list[0]);
+	}	
 }
 
-TArray<Noeud> ATerrain::PathFinding(Noeud depart, Noeud objectif)
+void ATerrain::RemoveFirstNode(TArray<Noeud*>& list)
 {
-	/*closedList = File()
-	   openList = FilePrioritaire(comparateur = compareParHeuristique)
-	   openList.ajouter(depart)
-	   tant que openList n'est pas vide
-		   u = openList.defiler()
-		   si u.x == objectif.x et u.y == objectif.y
-			   reconstituerChemin(u)
-			   terminer le programme
-		   pour chaque voisin v de u dans g
-			   si non(   v existe dans closedList
-							ou v existe dans openList avec un coût inférieur)
-					v.cout = u.cout +1
-					v.heuristique = v.cout + distance([v.x, v.y], [objectif.x, objectif.y])
-					openList.ajouter(v)
-		   closedList.ajouter(u)
-	   terminer le programme (avec erreur)*/
+	Swap(list[list.Num() - 1], list[0]);
+	list.Pop();
+}
 
+TArray<int> ATerrain::PathFinding(Noeud depart, Noeud objectif)
+{
 	   //verifier si x/y pas un mur, sinon trouver la case la plus close du mur et dans la direction du perso puis relancer foncion sur ces coord
 	   //a* voir cours
 	   //mettre le plus petit en first a chaque boucle
+	
+	if(!isValid(objectif.x,objectif.y)) return TArray<int>();
 	TArray<Noeud> closedList = {};
-	TArray<Noeud> openList = {};
+	TArray<Noeud*> openList = {};
 	TArray<std::tuple<int,int>> voisins;
-	openList.Add(depart);
+	openList.Add(new Noeud(depart));
+	SortListNoeud(openList);
+
 	while (openList.Num() != 0)
 	{
-		Noeud n = openList[0];
-		voisins = { {n.x + 1,n.y},{n.x - 1,n.y},{n.x,n.y + 1},{n.x,n.y - 1} };
-		if (n.x == objectif.x && n.y == objectif.y)
+		Noeud * n = openList[0];
+		if (n->x == objectif.x && n->y == objectif.y)
 		{
-			TArray<Noeud> path;
-			path.Add(n);
-			while (n.Parent != NULL)
+			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("FIND"), n->x, n->y));
+			TArray<int> path;
+			Noeud* childNode;
+			while (n->Parent != nullptr && n->Parent != NULL)
 			{
-				path.Add(n);
-				n = *n.Parent;
+				path.Add(n->movement);				
+				childNode = n;
+				n = n->Parent;
+				delete(childNode);
 			}
 			return path;
 		}
+
+		voisins = { {n->x + 1,n->y},{n->x,n->y + 1} ,{n->x - 1,n->y}, {n->x,n->y - 1} };
+		int i = 0;
 		for (std::tuple<int, int> voisin : voisins)
 		{
-			if (InMatrix(voisin))
+			int x = std::get<0>(voisin);
+			int y = std::get<1>(voisin);
+			if (isValid(x,y))
 			{
-				int x = std::get<0>(voisin);
-				int y = std::get<1>(voisin);
-				Noeud v = { x, y, n.cout+1, Manhattan(x,y,objectif.x,objectif.y), &n};
-				if (!ContainsNoeud(closedList,v) || ContainsCloserH(openList,v))
+				Noeud * v = new Noeud{ x, y, n->cout, Manhattan(x,y,objectif.x,objectif.y), n , i};
+				if (!(ContainsNoeud(closedList,*v) || ContainsCloserH(openList,*v)))
 				{
+					v->cout += 1;
 					openList.Add(v);
 				}
 			}
+			i++;
 		}
-		closedList.Add(n);
+		RemoveFirstNode(openList);
 		SortListNoeud(openList);
+		closedList.Add(*n);
 	}
-	return TArray<Noeud>();
+	return TArray<int>();
 }
 
 // Called every frame

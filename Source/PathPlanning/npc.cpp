@@ -28,42 +28,47 @@ Anpc::Anpc()
 void Anpc::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	directionLocation = GetActorLocation();
 }
 
 // Called every frame
 void Anpc::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (path.Num()>0 && GetVelocity().IsNearlyZero())
+	if (path.Num()>0 && GetActorLocation().Equals(directionLocation,10.f))
 	{
 		int direction = path[0];
 		switch (direction)
 		{
 		case 0: //haut
-			MoveForward(100.f);
+			directionLocation = { GetActorLocation().X + 50 ,GetActorLocation().Y,GetActorLocation().Z };
+			MoveForward(70.f);
 			break;
 		case 1: //droite
-			MoveRight(100.f);
+			directionLocation = { GetActorLocation().X ,GetActorLocation().Y + 50,GetActorLocation().Z };
+			MoveRight(70.f);
 			break;
 		case 2: //bas
-			MoveForward(-100.f);
+			directionLocation = { GetActorLocation().X - 50, GetActorLocation().Y, GetActorLocation().Z };
+			MoveForward(-70.f);
 			break;
 		case 3: //gauche
-			MoveRight(-100.f);
+			directionLocation = { GetActorLocation().X ,GetActorLocation().Y - 50 ,GetActorLocation().Z };
+			MoveRight(-70.f);
 			break;
 		default:
 			break;
 		}
-		if (path.Num() == 1) {
+		if (path.Num() <= 1) {
 			path = {};
 		}
 		else
 		{
 			for (int i = 1; i < path.Num(); i++)
 				path[i - 1] = path[i];
+			path.Pop();
 		}
-		
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("%f/%f/%f"), directionLocation.X, directionLocation.Y, directionLocation.Z));
 	}
 }
 
@@ -72,8 +77,6 @@ void Anpc::MoveForward(float Value)
 	clock_t start = clock();
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{	
-		bool arriver = false;
-
 		FVector goal = {GetActorLocation().X + Value, GetActorLocation().Y , GetActorLocation().Z};
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), goal);
 	}
@@ -84,8 +87,6 @@ void Anpc::MoveRight(float Value)
 	clock_t start = clock();
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		bool arriver = false;
-
 		FVector goal = { GetActorLocation().X  , GetActorLocation().Y + Value, GetActorLocation().Z };
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(),goal);
 	}
