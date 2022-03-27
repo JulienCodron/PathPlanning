@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Terrain.h"
-#include "npc.h"
+#include "Stearing_Npc.h"
 
 #include "GameFramework/PlayerController.h"
 #include "NPC_PlayerController.generated.h"
@@ -19,11 +19,12 @@ class PATHPLANNING_API ANPC_PlayerController : public APlayerController
 	
 protected: 
 	virtual void BeginPlay() override;
+	int pathToSpawn = 0;
 
 public:
 	void SetupInputComponent() override;
 	void OnMouseClick();
 
 	ATerrain * terrain;
-	Anpc* character;
+	AStearing_Npc* character;
 };

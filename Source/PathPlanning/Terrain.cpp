@@ -152,9 +152,7 @@ void ATerrain::RemoveFirstNode(TArray<Noeud*>& list)
 
 TArray<int> ATerrain::PathFinding(Noeud depart, Noeud objectif)
 {
-	   //verifier si x/y pas un mur, sinon trouver la case la plus close du mur et dans la direction du perso puis relancer foncion sur ces coord
-	   //a* voir cours
-	   //mettre le plus petit en first a chaque boucle
+	//verifier si x/y pas un mur, sinon trouver la case la plus close du mur et dans la direction du perso puis relancer foncion sur ces coord
 	
 	if(!isValid(objectif.x,objectif.y)) return TArray<int>();
 	TArray<Noeud> closedList = {};
@@ -168,7 +166,6 @@ TArray<int> ATerrain::PathFinding(Noeud depart, Noeud objectif)
 		Noeud * n = openList[0];
 		if (n->x == objectif.x && n->y == objectif.y)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("FIND"), n->x, n->y));
 			TArray<int> path;
 			Noeud* childNode;
 			while (n->Parent != nullptr && n->Parent != NULL)
@@ -192,7 +189,6 @@ TArray<int> ATerrain::PathFinding(Noeud depart, Noeud objectif)
 				Noeud * v = new Noeud{ x, y, n->cout, Manhattan(x,y,objectif.x,objectif.y), n , i};
 				if (!(ContainsNoeud(closedList,*v) || ContainsCloserH(openList,*v)))
 				{
-					v->cout += 1;
 					openList.Add(v);
 				}
 			}
